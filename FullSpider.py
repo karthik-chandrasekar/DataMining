@@ -44,13 +44,17 @@ class BeautifulSpider:
     def getContent(self, soup, url):
         url = url.replace(self.snopes,"")
         url = url.replace("/","-")
-        main_content = soup.find_all("div", {"id":"main-content"}) or soup.find_all("div", {"class":"article_text"})
+
+        main_content = soup.find_all("div", {"id":"main-content"})
+        main_content.extend(soup.find_all("div", {"class":"article_text"}))
+        main_content.extend(soup.find_all("div", {"class":"quoteBlockEnd"}))
+
+        main_content = [x for x in main_content if x]
+        
         temp_list = []
         for samp in main_content:
+            temp_list.append(samp.getText().encode('utf-8'))
             internal_id = samp.find_all("div")
-            if not internal_id:
-                temp_list.append(samp.getText().encode('utf-8'))
-                continue
             for samp2 in internal_id:
                 temp_list.append(samp2.getText().encode('utf-8'))
         open(url, 'w').write(json.dumps(temp_list))
