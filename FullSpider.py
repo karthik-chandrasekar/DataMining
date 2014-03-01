@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
-import re
-import urllib2
+import urllib2, json
 
 class BeautifulSpider:
     
@@ -15,7 +14,7 @@ class BeautifulSpider:
         if not self.url_list:return
         for url in self.url_list:
             self.getUrls(url)
-            self.it_count += 1;
+            self.it_count += 1
             self.url_list = self.url_list[1:]
         self.run_main()
 
@@ -45,11 +44,16 @@ class BeautifulSpider:
     def getContent(self, soup, url):
         url = url.replace(self.snopes,"")
         url = url.replace("/","-")
-        main_content = soup.find_all("div", {"id":"main-content"})
+        main_content = soup.find_all("div", {"id":"main-content"}) or soup.find_all("div", {"class":"article_text"})
+        temp_list = []
         for samp in main_content:
             internal_id = samp.find_all("div")
+            if not internal_id:
+                temp_list.append(samp.getText().encode('utf-8'))
+                continue
             for samp2 in internal_id:
-                open(url, 'w').write(samp2.getText().encode('utf-8')) 
+                temp_list.append(samp2.getText().encode('utf-8'))
+        open(url, 'w').write(json.dumps(temp_list))
 
 if __name__ == "__main__":
     bs = BeautifulSpider()
