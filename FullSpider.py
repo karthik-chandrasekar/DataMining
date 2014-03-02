@@ -59,7 +59,8 @@ class BeautifulSpider:
             #    temp_list.append(samp2.getText().encode('utf-8'))
         final_string = " ".join(temp_list)
         temp_list = []
-        temp_list.append(final_string) 
+        temp_list.append(final_string)
+        url = url.replace(".asp", ".txt") 
         open(url, 'w').write(json.dumps(temp_list))
 
 if __name__ == "__main__":
