@@ -50,13 +50,13 @@ class BeautifulSpider:
         main_content.extend(soup.find_all("div", {"class":"quoteBlockEnd"}))
 
         main_content = [x for x in main_content if x]
-        
+       
         temp_list = []
         for samp in main_content:
             temp_list.append(samp.getText().encode('utf-8'))
-            internal_id = samp.find_all("div")
-            for samp2 in internal_id:
-                temp_list.append(samp2.getText().encode('utf-8'))
+            #internal_id = samp.find_all("div")
+            #for samp2 in internal_id:
+            #    temp_list.append(samp2.getText().encode('utf-8'))
         final_string = " ".join(temp_list)
         temp_list = []
         temp_list.append(final_string) 
