@@ -9,12 +9,10 @@ class ExtractOutput:
         self.pattern = re.compile('[\W_]+')
 
     def run_main(self):
-
         #files = os.listdir(os.curdir)
         files = ['movies-actors-barrymore.asp']
         for fileName in files:
             data = {}
-           
             try:
                 if (fileName.endswith(".py")):
                     continue
@@ -43,7 +41,6 @@ class ExtractOutput:
         return line
 
     def splitData(self, key_index, data, line):
-        
         cur_key = None
         cur_index = None
 
@@ -60,7 +57,6 @@ class ExtractOutput:
         data[cur_key] = self.dataClean(line[cur_index:], cur_key)
 
     def dataClean(self, line, key):
-            
         key = self.pattern.sub("", key)
         line = self.pattern.sub(" ", line).split(" ")
         return "@@@"+"begin"+key+"@@@"+" ".join(line[1:])+"@@@"+"end"+key+"@@@"
