@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import urllib2
+import urllib2, json
 
 class FullSpider:
     
@@ -8,6 +8,7 @@ class FullSpider:
         self.black_listed_keywords = ['http', 'mailto'] 
         self.snopes = "http://www.snopes.com/"
         self.it_count = 0
+        self.index = None
 
     def run_main(self):
         for index, url in enumerate(self.url_list):
@@ -55,8 +56,7 @@ class FullSpider:
         for samp in main_content:
             content.append(samp.getText().encode('utf-8'))
         url = url.replace(".asp", ".txt") 
-        text = " ".join(content)
-        open(url, 'w').write(text)
+        open(url, 'w').write(json.dumps(content))
 
 if __name__ == "__main__":
     bs = FullSpider()
