@@ -9,8 +9,8 @@ class ExtractOutput:
         self.pattern = re.compile('[\W_]+')
 
     def run_main(self):
-        #files = os.listdir(os.curdir)
-        files = ['movies-actors-barrymore.asp']
+        files = os.listdir(os.curdir)
+        #files = ['movies-actors-barrymore.asp']
         for fileName in files:
             data = {}
             try:
@@ -19,18 +19,19 @@ class ExtractOutput:
 
                 key_index  = []
                 for line in json.loads(open(fileName).read()):
-                    line = self.remLastUpdated(line)
+                    line = self.removeLastUpdated(line)
                     for key in self.keywords:
                         key_index.append((key, line.find(key)))
-                self.splitData(key_index, data, line) 
-
+                self.getData(key_index, data, line) 
+            
+                if not data:continue
                 final_string = "\n".join(data.values()) 
                 open(fileName+"_new", "w").write(final_string)  
             except:
                 print "Exception for fileName - %s" % (fileName)
 
 
-    def remLastUpdated(self, line):
+    def removeLastUpdated(self, line):
         lup_index = line.find('Last updated:')
         sources_index = line.find('Sources:')
         source_line = " "
@@ -40,7 +41,7 @@ class ExtractOutput:
             line = line[:lup_index] + source_line
         return line
 
-    def splitData(self, key_index, data, line):
+    def getData(self, key_index, data, line):
         cur_key = None
         cur_index = None
 
@@ -54,10 +55,11 @@ class ExtractOutput:
             data[cur_key] = self.dataClean(line[cur_index:index], cur_key)
             cur_key = key
             cur_index = index
+        
+        if not cur_key or cur_index == -1:data= {};return
         data[cur_key] = self.dataClean(line[cur_index:], cur_key)
 
     def dataClean(self, line, key):
-        key = self.pattern.sub("", key)
         line = self.pattern.sub(" ", line).split(" ")
         return "@@@"+"begin"+key+"@@@"+" ".join(line[1:])+"@@@"+"end"+key+"@@@"
 
