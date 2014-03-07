@@ -1,42 +1,48 @@
 from bs4 import BeautifulSoup
-import re
-import urllib2
+import urllib2, json
 
 class BeautifulSpider:
     
     def __init__(self):
-        self.movies_url = "http://www.snopes.com/movies/films/blucher.asp"
-        self.content_url = "http://www.snopes.com/sports/baseball/ripkenstreak.asp"
-   
-    def run_main(self):
+        self.url_list = ["http://www.snopes.com/movies/movies.asp"] 
+        self.black_listed_keywords = ['http', 'mailto'] 
+        self.snopes = "http://www.snopes.com/"
+  
 
-        junk_list = ['http','mailto']
-        data = {}
-        page = urllib2.urlopen(self.movies_url).read()
-        soup = BeautifulSoup(page)
-        urls_list = soup.find_all('a',href=True)
-        for url in urls_list:
-            link = url['href']
-            if link[0].isalpha():
-                if not link.split(":")[0] in junk_list:
-                    #print link
-                    pass               
-        self.content()
-    
-    def content(self):
-        page = urllib2.urlopen(self.content_url).read()
-        soup = BeautifulSoup(page)
+    def run_main(self):
+        self.url_list = [
+        "http://www.snopes.com/sports/baseball/bttf2.asp",
+        "http://www.snopes.com/horrors/ghosts/blair.asp",
+        "http://www.snopes.com/movies/films/c3po.asp",
+        "http://www.snopes.com/movies/films/3menbaby.asp",
+        "http://www.snopes.com/sports/baseball/ripkenstreak.asp",
+        "http://www.snopes.com/autos/cursed/spyder.asp",
+        "http://www.snopes.com/glurge/beautytips.asp",
+        "http://www.snopes.com/disney/films/tinkerbell.asp",
+        "http://www.snopes.com/glurge/duke.asp"
+        ]
+        for url in self.url_list:
+            page = urllib2.urlopen(url).read()
+            soup = BeautifulSoup(page)
+            self.getContent(soup, url)
+ 
+    def getContent(self, soup, url):
+        #Scrapes the content from the given url
+       
+        url = url.replace(self.snopes,"")
+        url = url.replace("/","-")
+
         main_content = soup.find_all("div", {"id":"main-content"})
         main_content.extend(soup.find_all("div", {"class":"article_text"}))
         main_content.extend(soup.find_all("div", {"class":"quoteBlockEnd"}))
         main_content = [x for x in main_content if x]
-
-
+       
+        content = []
         for samp in main_content:
-            internal_id = samp.find_all("div")
-            print samp.getText()
-            for samp2 in internal_id:
-                print samp2.getText().encode('utf-8')
+            content.append(samp.getText().encode('utf-8'))
+        url = url.replace(".asp", ".txt") 
+        open(url, 'w').write(json.dumps(content))
+
 
 if __name__ == "__main__":
     bs_obj = BeautifulSpider()
