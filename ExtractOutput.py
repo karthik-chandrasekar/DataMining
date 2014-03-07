@@ -85,6 +85,8 @@ class ExtractOutput:
             if not value:continue
             if key == "Status:":
                 value = self.cleanStatus(value)
+            elif key == "Sources:":
+                value = self.cleanSources(value)
                 print value
             key = key.strip(":")
             final_string = "@@@begin"+key+"@@@"+value+"@@@end"+key+"@@@"
@@ -92,13 +94,20 @@ class ExtractOutput:
         return new_data
 
     def cleanStatus(self, value):
-        if not value:return
+        if not value:return " "
         ex_index = value.find("Example") 
         if not ex_index == -1: 
             value =  value[:ex_index]
         if value.lower().strip() not in ('true', 'false', 'mixture'):
             value = 'Mixture'
         return value    
+
+    def cleanSources(self, value):
+        if not value:return " "
+        ad_index = value.find("google ad")
+        if not ad_index == -1:
+            value = value[:ad_index]
+        return value
 
 
 if __name__ == "__main__":
