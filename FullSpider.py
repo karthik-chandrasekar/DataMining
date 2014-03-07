@@ -42,7 +42,7 @@ class FullSpider:
             new_url = "http://%s" % ('/'.join(url))
             self.url_list.append(new_url)
         
-    def getContent(self, soup, url):
+    def getContentOld(self, soup, url):
         #Scrapes the content from the given url
        
         url = url.replace(self.snopes,"")
@@ -58,6 +58,21 @@ class FullSpider:
             content.append(samp.getText().encode('utf-8'))
         url = url.replace(".asp", ".txt") 
         open(url, 'w').write(json.dumps(content))
+
+
+    def getContent(self, soup, url):
+        #Scrapes the content from the given url
+       
+        url = url.replace(self.snopes,"")
+        url = url.replace("/","-")
+
+        content = []
+        main_content = soup.get_text()
+        if not main_content:return
+        content.append(main_content.encode('utf-8'))
+        main_content = [x for x in main_content if x]
+        open(url, 'w').write(json.dumps(content))
+
 
 if __name__ == "__main__":
     bs = FullSpider()
