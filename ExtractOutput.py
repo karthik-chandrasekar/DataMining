@@ -1,18 +1,19 @@
 #!/usr/bin/python
 
 import re, json, os
+from collections import OrderedDict
 
 class ExtractOutput:
 
     def __init__(self):
-        self.keywords = ['Claim:', 'Status:', 'Origins:', 'Sources:', 'Last updated:']
+        self.keywords = ['Claim:', 'Status:', 'Example:', 'Origins:', 'Sources:']
         self.pattern = re.compile('[\W_]+')
 
     def run_main(self):
         files = os.listdir(os.curdir)
         #files = ['movies-actors-barrymore.asp']
         for fileName in files:
-            data = {}
+            data = OrderedDict()
             if (fileName.endswith(".py")):
                 continue
 
@@ -20,7 +21,6 @@ class ExtractOutput:
             line = ""
             try:
                 line  = json.loads(open(fileName).read())[0]
-                     
                 line = self.removeLastUpdated(line)
                 for key in self.keywords:
                     key_index.append((key, line.find(key)))
@@ -79,10 +79,10 @@ class ExtractOutput:
         data['Status:'] = status.strip()
 
     def formatData(self, data):
-        new_data = {}
+        new_data = OrderedDict()
         if not data:return
-        for key, value in data.iteritems():
-            if not value:continue
+        for key in self.keywords:
+            value = data.get(key, "")
             if key == "Status:":
                 value = self.cleanStatus(value)
             elif key == "Sources:":
@@ -94,7 +94,7 @@ class ExtractOutput:
         return new_data
 
     def cleanStatus(self, value):
-        if not value:return " "
+        if not value:return ""
         ex_index = value.find("Example") 
         if not ex_index == -1: 
             value =  value[:ex_index]
@@ -103,7 +103,7 @@ class ExtractOutput:
         return value    
 
     def cleanSources(self, value):
-        if not value:return " "
+        if not value:return ""
         ad_index = value.find("google ad")
         if not ad_index == -1:
             value = value[:ad_index]
