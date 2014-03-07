@@ -29,7 +29,8 @@ class FullSpider:
         
         for link in links:
             link = link['href']
-            link = link and link.strip()
+            if not link:continue
+            link = link.strip()
             if not link[0].isalpha():continue
             if link.split(":")[0] in self.black_listed_keywords:continue 
             if link == self.snopes:continue
@@ -43,7 +44,7 @@ class FullSpider:
         
     def getContent(self, soup, url):
         #Scrapes the content from the given url
-        
+       
         url = url.replace(self.snopes,"")
         url = url.replace("/","-")
 
