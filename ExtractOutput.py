@@ -28,8 +28,9 @@ class ExtractOutput:
                 if not 'Status:' in data and 'Claim:' in data: 
                     self.statusCheck(data)
                 data = self.formatData(data) 
-                final_string = "\n".join(data.values()) 
-                open(fileName+"_new", "w").write(final_string)  
+                final_string = "\n".join(data.values())
+                fileName = fileName.replace("asp", "txt") 
+                open(fileName, "w").write(final_string)  
 
             except:
                 print "Exception for %s" % (fileName)
@@ -88,8 +89,8 @@ class ExtractOutput:
             elif key == "Sources:":
                 value = self.cleanSources(value)
                 print value
-            key = key.strip(":")
-            final_string = "@@@begin"+key+"@@@"+value+"@@@end"+key+"@@@"
+            key = key.strip(":").lower()
+            final_string = "@@@begin_"+key+"@@@"+value+"@@@end_"+key+"@@@"
             new_data[key] = final_string
         return new_data
 
