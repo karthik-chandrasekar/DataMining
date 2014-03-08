@@ -42,23 +42,6 @@ class FullSpider:
             new_url = "http://%s" % ('/'.join(url))
             self.url_list.append(new_url)
         
-    def getContentOld(self, soup, url):
-        #Scrapes the content from the given url
-       
-        url = url.replace(self.snopes,"")
-        url = url.replace("/","-")
-
-        main_content = soup.find_all("div", {"id":"main-content"})
-        main_content.extend(soup.find_all("div", {"class":"article_text"}))
-        main_content.extend(soup.find_all("div", {"class":"quoteBlockEnd"}))
-        main_content = [x for x in main_content if x]
-       
-        content = []
-        for samp in main_content:
-            content.append(samp.getText().encode('utf-8'))
-        url = url.replace(".asp", ".txt") 
-        open(url, 'w').write(json.dumps(content))
-
 
     def getContent(self, soup, url):
         #Scrapes the content from the given url
