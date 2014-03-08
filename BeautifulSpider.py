@@ -9,7 +9,7 @@ class BeautifulSpider:
         self.snopes = "http://www.snopes.com/"
   
 
-    def run_main_back(self):
+    def run_main(self):
         self.url_list = [
         "http://www.snopes.com/sports/baseball/bttf2.asp",
         "http://www.snopes.com/horrors/ghosts/blair.asp",
@@ -27,7 +27,7 @@ class BeautifulSpider:
             self.getContent(soup, url)
  
 
-    def run_main(self):
+    def run_main_back(self):
         self.url_list = [
         "http://www.snopes.com/movies/other/spielberg.asp"
         ]
@@ -48,13 +48,6 @@ class BeautifulSpider:
         content.append(main_content.encode('utf-8'))
         main_content = [x for x in main_content if x]
         open(url, 'w').write(json.dumps(content))
-        #main_content = soup.find_all("div", {"id":"main-content"})
-        #main_content.extend(soup.find_all("div", {"class":"article_text"}))
-        #main_content.extend(soup.find_all("div", {"class":"quoteBlockEnd"}))
-       
-        #for samp in main_content:
-        #    content.append(samp.encode('utf-8'))
-        #url = url.replace(".asp", ".txt") 
 
 
 if __name__ == "__main__":
