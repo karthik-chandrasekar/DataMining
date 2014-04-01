@@ -21,8 +21,10 @@ class SnopesClassifier:
         self.test_map = {}
         self.test_list = []   
         self.test_file = 'testing.txt'     
-        self.test_output = 'test_output.txt'
-        
+        self.label_training_file = 'label_training.txt'
+        self.nb_classifier_output = "nb_classifier_output"
+        self.svm_classifier_output = "svm_classifier_output"
+
         self.nb_accuracy_list = []
         self.svm_accuracy_list = []
 
@@ -38,7 +40,7 @@ class SnopesClassifier:
         self.load_feature_input(self.train_file, self.train_map)
 
         #load class labels
-        with open('label_training.txt') as labels_fd:
+        with open(self.label_training_file) as labels_fd:
             for line in labels_fd.readlines():
                 line = line and line.strip()
                 if not line:continue
@@ -89,8 +91,8 @@ class SnopesClassifier:
         self.load_feature_input(self.test_file, self.test_map)
         self.pre_process_test_input()
 
-        self.classify_test_input(self.nb_classifier, "NB Classifier_output")
-        self.classify_test_input(self.svm_classifier, "SVM Classifier_output")
+        self.classify_test_input(self.nb_classifier, self.nb_classifier_output)
+        self.classify_test_input(self.svm_classifier, self.svm_classifier_output)
 
     def load_feature_input(self, file_name, input_map):
         with open(file_name) as fd:
