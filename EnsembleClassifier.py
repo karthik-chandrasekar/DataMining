@@ -24,8 +24,13 @@ class EnsembleClassifier:
         self.svm_classifier_output = "svm_classifier_output"
 
         #Sparse Matrix
+
+        #Training data
         self.sparse_matrix = lil_matrix((1842, 26364), dtype=float)
         self.training_labels_list = []
+
+        #Test data
+        self.test_data = lil_matrix((952, 26364), dtype=float)
 
     def load_input(self, filename):
         with open(filename) as file_fd:
@@ -33,24 +38,33 @@ class EnsembleClassifier:
                 yield line
 
     def main(self):
-        self.load_training_data()
-        self.load_training_labels()
-        self.load_test_data()
-        self.cross_validation()
+        #Loading training data
+        self.sparse_matrix = self.load_input_data(self.sparse_matrix, self.train_file)
 
-    def load_training_data(self):
-        for line in self.load_input(self.train_file):
+        #Loading training labels
+        self.load_training_labels()
+
+        #Loading test data
+        self.test_data = self.load_input_data(self.test_data, self.test_file)
+
+        #Classify test data
+        self.cross_validation_prediction()
+
+
+    def load_input_data(self, input_data, input_file):
+        for line in self.load_input(input_file):
             line = line and line.strip()
             if not line:continue
             try:
                 row, col, val = line.split(' ')
                 row, col, val = int(row)-1, int(col)-1, float(val)
-                self.sparse_matrix[row, col] = val
+                input_data[row, col] = val
             except Exception,e:
                 print line
           
-        #Convert lil_matrix to normal array for efficient computing
-        self.sparse_matrix = self.sparse_matrix.toarray() 
+        #Convert lil_matrix to normal array
+        input_data = input_data.toarray()
+        return input_data 
 
     def load_training_labels(self):
         for line in self.load_input(self.label_training_file):
@@ -60,34 +74,44 @@ class EnsembleClassifier:
             self.training_labels_list.append(line) 
         self.training_labels_list = numpy.array(self.training_labels_list)
         
-    def load_test_data(self):
-       pass 
-
-    def cross_validation(self):
+    def cross_validation_prediction(self):
         #self.selectAdaBoostClassifier()
-        #self.selectRandomForestClassifier()
+        self.selectRandomForestClassifier()
         #self.selectExtraTreesClassifier()
-        self.selectGradientBoostingClassifier()
+        #self.selectGradientBoostingClassifier()
 
     def selectAdaBoostClassifier(self):
-        clf = AdaBoostClassifier(n_estimators=100,  max_depth=None, min_samples_split=1, random_state=0, n_jobs=-1)
+        clf = AdaBoostClassifier(n_estimators=100)
         scores = cross_val_score(clf, self.sparse_matrix, self.training_labels_list)
         print "AdaBoostClassifier  -  %s" % scores.mean()
+        self.classify_test_data(clf)
 
     def selectRandomForestClassifier(self):
-        clf = RandomForestClassifier(n_estimators=100,  max_depth=None, min_samples_split=1, random_state=0, n_jobs=-1)
+        clf = RandomForestClassifier(n_estimators=100,  max_depth=None, min_samples_split=1, random_state=0)
+        clf.n_classes_ = 2
+        clf.n_outputs_ = 1 
+        clf.classes_ = numpy.array([1,-1])
         scores = cross_val_score(clf, self.sparse_matrix, self.training_labels_list)
         print "RandomForestClassifier - %s" % scores.mean()
+        self.classify_test_data(clf)
 
     def selectExtraTreesClassifier(self):
         clf = ExtraTreesClassifier(n_estimators=100, max_depth=None, min_samples_split=1, random_state=0, n_jobs=-1)
         scores = cross_val_score(clf, self.sparse_matrix, self.training_labels_list)
         print "ExtraTreesClassifie - %s" % scores.mean()
+        self.classify_test_data(clf)
 
     def selectGradientBoostingClassifier(self):
         clf = GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
         scores = cross_val_score(clf, self.sparse_matrix, self.training_labels_list)
         print "GradientBoostingClassifier - %s"  % scores.mean()
+        self.classify_test_data(clf)
+
+    def classify_test_data(self, clf):
+        result = []
+        for i in xrange(952):
+            result.append(clf.predict(self.test_data[0]))
+        print result
 
 if __name__ == '__main__':
     ec = EnsembleClassifier()
