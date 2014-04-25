@@ -15,25 +15,25 @@ class ParticipantsPoll:
     def loadAllInput(self):
         allFiles = listdir('.')
       
-        try: 
-            for aFile in allFiles:
-                if aFile.endswith("py"):continue
-                aFileOpList = []
-                with open(aFile) as aFilefd:
-                    for line in aFilefd:
-                        line = line and line.strip()
-                        aFileOpList.append(int(line))
-                self.allFilesResultsMap[aFile] = aFileOpList
-        except:
-            print "Exception during loading votes"
+        for aFile in allFiles:
+            if aFile.endswith("py") or aFile.startswith("voting"):
+                continue
+            aFileOpList = []
+            with open(aFile) as aFilefd:
+                for line in aFilefd.readlines():
+                    line = line and line.strip()
+                    aFileOpList.append(int(line))
+            self.allFilesResultsMap[aFile] = aFileOpList
+            aFilefd.close()
  
     def doVoting(self):
         self.cumVotingList = [0] * self.test_instances_count        
 
         for aFileList in self.allFilesResultsMap.values():
             self.cumVotingList = [x+y for x,y in zip(self.cumVotingList, aFileList)]
-        
+ 
     def announceResults(self):
+        votingCountFd = open('votingCount', 'w')
         with open(self.resultsFile, 'w') as resultsFd:
             for line in self.cumVotingList:
                 if line > 0:
@@ -41,6 +41,8 @@ class ParticipantsPoll:
                 elif line <=0:
                     verdict = -1
                 resultsFd.write("%s\n" % verdict)
+                votingCountFd.write("%s\n" % line)
+        votingCountFd.close()
 
 if __name__ == "__main__":
     pp = ParticipantsPoll()
